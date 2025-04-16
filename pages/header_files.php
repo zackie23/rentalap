@@ -35,7 +35,7 @@
                         </li>
                         <li class="notification">
                             <div class="media">
-                                <img class="img-radius" src="../assets/images/user/avatar-1.jpg"
+                                <img class="img-radius" src="../dist/images/user/avatar-1.webp"
                                     alt="Generic placeholder image" />
                                 <div class="media-body">
                                     <p>
@@ -52,7 +52,7 @@
                         </li>
                         <li class="notification">
                             <div class="media">
-                                <img class="img-radius" src="../assets/images/user/avatar-2.jpg"
+                                <img class="img-radius" src="../dist/images/user/avatar-2.webp"
                                     alt="Generic placeholder image" />
                                 <div class="media-body">
                                     <p>
@@ -66,7 +66,7 @@
                         </li>
                         <li class="notification">
                             <div class="media">
-                                <img class="img-radius" src="../assets/images/user/avatar-1.jpg"
+                                <img class="img-radius" src="../dist/images/user/avatar-1.webp"
                                     alt="Generic placeholder image" />
                                 <div class="media-body">
                                     <p>
@@ -80,7 +80,7 @@
                         </li>
                         <li class="notification">
                             <div class="media">
-                                <img class="img-radius" src="../assets/images/user/avatar-2.jpg"
+                                <img class="img-radius" src="../dist/images/user/avatar-2.webp"
                                     alt="Generic placeholder image" />
                                 <div class="media-body">
                                     <p>
@@ -102,11 +102,11 @@
         <li>
             <div class="dropdown drp-user">
                 <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="../assets/images/user/avatar-1.jpg" class="img-radius wid-40" alt="User-Profile-Image" />
+                    <img src="../dist/images/user/avatar-1.webp" class="img-radius wid-40" alt="User-Profile-Image" />
                 </a>
                 <div class="dropdown-menu dropdown-menu-end profile-notification">
                     <div class="pro-head">
-                        <img src="../assets/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image" />
+                        <img src="../dist/images/user/avatar-1.webp" class="img-radius" alt="User-Profile-Image" />
                         <small><?=$_SESSION['namapengguna'];?></small>
                         <a href="logout.php" class="dud-logout" title="Logout">
                             <i class="feather icon-log-out"></i>

@@ -165,4 +165,15 @@ function uploadFile($namafileyangdiinginkan, $fileType = "image", $fileSize = 10
     ];
 }
 
+
+function sentEmail($toEmail,$nama_user,$type){
+    
+    if($type == "signup"){
+        $message = '
+        
+        ';
+    }elseif($type == "reset"){
+
+    }
+}
 ?>

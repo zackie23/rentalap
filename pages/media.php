@@ -91,7 +91,7 @@ if($_SESSION['login'] != 1){
                                 </div>
                                 <div class="card-body">
                                     <div class="text-center">
-                                        <h1 class="text-danger">404</h1>
+                                        <img src="../dist/images/auth/404.webp" style="width:30%">
                                         <p class="lead text-gray-800 mb-5">The page you are looking for has not been found!</p>
                                         <p class="text-gray-500 mb-0">The page you are looking for might have been removed, or unavailable.</p>
                                         <a href="dashboard">&larr; Back to Dashboard</a>
@@ -109,7 +109,7 @@ if($_SESSION['login'] != 1){
             <div class="p-10 bg-white sc-footer">
                 <div class="container my-auto">
                     <div>
-                        <small class="text-muted">Copyright &copy; suaracaleg.com <?=DATE('Y')?></small>
+                        <small class="text-muted">Copyright &copy; bookingonline.com <?=DATE('Y')?></small>
                     </div>
                 </div>
             </div>

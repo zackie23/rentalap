@@ -35,7 +35,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
 
             $update = $conn->query("UPDATE tb_partai_politik SET ".$whr." nama_partai='$nama_partai', singkatan = '$singkatan', color = '$color', status = '$status'  
             WHERE id_partai = '$idb'");
-            pg_close($conn);
+            $conn->close();
             if ($update) {
                 save_alert_swall('save', "Data berhasil diubah");
             } else {
@@ -46,7 +46,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
         //DELETE
         $id = filter($_POST['id']);
         $delete = $conn->Query("DELETE FROM tb_partai_politik where id_partai=".$id);
-        pg_close($conn);
+        $conn->close();
         if ($delete) {
             save_alert_swall('save', "Data berhasil dihapus");
         } else {
@@ -56,7 +56,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
         if ($_GET['act'] != "new") {
             $idb = base64_decrypt($_GET['id'], $key);
             $sql = $conn->query("SELECT * FROM tb_partai_politik WHERE id_partai='$idb'");
-            $data = $sql->fetch(PDO::FETCH_ASSOC);
+            $data = $sql->fetch_assoc();
             $nama_partai = $data['nama_partai'];
             $singkatan = $data['singkatan'];
             $color = $data['color'];

@@ -15,7 +15,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
         default:
             if ($_SESSION['idlevel'] != 1) {
                 $conn->query("INSERT INTO tb_data_error (email,waktu,url,ip_address) VALUES ('$_SESSION[id_user]',NOW(),'$absolute_url','$ip') ");
-                pg_close($conn);
+                $conn->close();
                 ?>
                 <div id="restricted">
                     <div class="card">

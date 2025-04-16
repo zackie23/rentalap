@@ -17,20 +17,24 @@ $orderByColumn = $_POST['order'][0]['column'];
 $rownumawal = $start + 1;
 $rownumakhir = $start + $length;
 
-if($module == "partai_politik"){
+if($module == "pengguna"){
     if($search!=""){
-		$filter	=	"	WHERE 	(nama_partai like '%$search%'
-								or singkatan like '%$search%'
-                                or color like '%$search%'
+		$filter	=	"	WHERE 	(t1.name like '%$search%'
+								or email like '%$search%'
+                                or phone like '%$search%'
 								)
 						";
 	}
 
-    $order1 = " order by nama_partai ";
+    $order1 = " order by t1.name ";
 
-    $query1 = "	select *,
+    $query1 = "	select t1.id,t1.name,t1.email,t1.phone,
 					ROW_NUMBER() OVER (".$order1.") AS no_urut	
-				    from tb_partai_politik
+				    from tb_users t1 
+                    left join tb_user_roles t2 on t1.id=t2.user_id
+                    left join tb_roles t3 on t3.id=t2.role_id
+                    left join tb_team_members t4 on t1.id=t4.user_id
+                    
 				";
 
     $query  =   "select * from (".$query1." ".$filter." )xxx";
@@ -38,7 +42,7 @@ if($module == "partai_politik"){
 
     $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
     
-    $hasil2 = $query_jumlah->fetch(PDO::FETCH_ASSOC);
+    $hasil2 = $query_jumlah->fetch_assoc();
     
     $iFilteredTotal = $hasil2['jumlah'];
     $iTotal = $iFilteredTotal;
@@ -48,16 +52,20 @@ if($module == "partai_politik"){
     );    
     $a=1;
 	if($iFilteredTotal>0){
-        while ( $hasil1 = $stid1->fetch(PDO::FETCH_ASSOC))
+        while ( $hasil1 = $stid1->fetch_assoc())
         {   
-            $id = base64_encrypt($hasil1['id_partai'],$key);
+            $id = base64_encrypt($hasil1['id'],$key);
             $lambang = explode(".",$hasil1['lambang']);
             $lambang = ($lambang[0] !="") ? "../dist/pictures/partai_politik/".$lambang[0].".webp" : "https://via.placeholder.com/50";
             $row 	= array();
-            $row[]	= '<img src="'.$lambang.'" style="width:100%">';
-            $row[]	= $hasil1['nama_partai'];
-            $row[]	= $hasil1['singkatan'];
-            $row[]	= $hasil1['color'];
+            // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['email'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['phone'];
             $row[]	= '<div class="btn-group btn-group-sm">
             <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
             <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
@@ -91,7 +99,7 @@ if($module == "partai_politik"){
 
     $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
     
-    $hasil2 = $query_jumlah->fetch(PDO::FETCH_ASSOC);
+    $hasil2 = $query_jumlah->fetch_assoc();
     
     $iFilteredTotal = $hasil2['jumlah'];
     $iTotal = $iFilteredTotal;
@@ -101,7 +109,7 @@ if($module == "partai_politik"){
     );    
     $a=0;
 	if($iFilteredTotal>0){
-        while ( $hasil1 = $stid1->fetch(PDO::FETCH_ASSOC))
+        while ( $hasil1 = $stid1->fetch_assoc())
         {   
             $row 	= array();
             $row[]  = $rownumawal+$a;

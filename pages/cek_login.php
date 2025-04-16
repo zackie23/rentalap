@@ -1,6 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ob_start();
 session_start();
-error_reporting(0);
 include '../ch0npi9/koneksi.php';
 include '../ch0npi9/library.php';
 include '../ch0npi9/function.php';
@@ -9,8 +11,6 @@ function anti_injection($data) {
     $filter = stripslashes(strip_tags(htmlspecialchars($data, ENT_QUOTES)));
     return $filter;
 }
-
-
 
 if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_token']){
     //Token Valid
@@ -21,17 +21,17 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
     $pasacak = md5($acak1 . md5($pass) . $acak2);
     $token = anti_injection($_POST['csrf_token']);
 
-    $link = apache_getenv("REQUEST_URI");
+    $link = getenv("REQUEST_URI");
 
 
     if(isset($_POST['submit']) && $_POST['submit'] == "login"){
 
         
-        $sql = "SELECT * FROM tb_user WHERE email='$username' AND password='$pasacak' AND status=1";
+        $sql = "SELECT * FROM tb_users WHERE email='$username' AND password='$pasacak' AND status=1";
         $hasil = $conn->query($sql);
-        $ketemu = $hasil->rowCount();
+        $ketemu = $hasil->num_rows;
         
-        $r = $hasil->fetch(PDO::FETCH_ASSOC);
+        $r = $hasil->fetch_assoc();
 
         if ($ketemu > 0) {
             
@@ -74,8 +74,8 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
         $sql = "SELECT * FROM tb_user WHERE email='$username'";
 
         $hasil = $conn->query($sql);
-        $ketemu = $hasil->rowCount();
-        $r = $hasil->fetch(PDO::FETCH_ASSOC);
+        $ketemu = $hasil->num_rows;
+        $r = $hasil->fetch_assoc();
 
         if ($ketemu > 0) {
             //email terdaftar arahkan user untuk login /auth
@@ -94,8 +94,33 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
             
             if($insert){
                 //Kirim Email Konfirmasi Ke User!
-                
-                $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
+                $to      = $username; // Send email to our user
+                $subject = 'Signup | Verification'; // Give the email a subject 
+                $message = '
+
+                Thanks for signing up!
+                Your account has been created, you can login with the following credentials after you have activated your account by pressing the url below.
+
+                ------------------------
+                Username: '.$username.'
+                Password: '.$pass.'
+                ------------------------
+
+                Please click this link to activate your account:
+                http://apps.bookingonline.com/pages/verify?email='.$username.'&hash='.$token.'
+
+                '; // Our message above including the link
+                                    
+                $headers = 'From:noreply@bookingonline.com' . "\r\n"; // Set from headers
+                $kirim = mail($to, $subject, $message, $headers);
+
+                if($kirim){
+                    $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
+                }else{
+                    $error = "Maaf, proses registrasi tidak berhasil!";
+                }
+
+                // $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
             }else{
                 $conn->query("INSERT INTO tb_data_error (email,waktu,url,ip_address) VALUES ('$username',NOW(),'$link;Registration Failed!','$ip;$browser') ");
                 $error = "Maaf, proses registrasi tidak berhasil!";
@@ -105,12 +130,11 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
     }elseif(isset($_POST['submit']) && $_POST['submit'] == "reset"){
 
     }
-    
-    pg_close($conn);
 }else{
     $error = "Token tidak valid.";
 }
 
+ob_clean();
 header('Content-Type: application/json');
 if (!empty($error)) {
     echo json_encode(array("error" => $error,"url" => $url_awal));

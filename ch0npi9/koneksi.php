@@ -2,26 +2,24 @@
 date_default_timezone_set('Asia/Hong_Kong');
 
 // Deteksi hanya bisa diinclude, tidak bisa langsung dibuka (direct open)
-if (count(get_included_files()) == 1) {
-    echo "<meta http-equiv='refresh' content='0; url=http://$_SERVER[HTTP_HOST]'>";
-    exit("Direct access not permitted.");
-}
+// if (count(get_included_files()) == 1) {
+//     echo "<meta http-equiv='refresh' content='0; url=http://$_SERVER[HTTP_HOST]'>";
+//     exit("Direct access not permitted.");
+// }
 // panggil fungsi validasi xss dan injection
 require_once("fungsi_validasi.php");
 
-$host       =  "localhost";
-$dbuser     =  "postgres";
-$dbpass     =  "123456";
-$port       =  "5432";
-$dbname    =  "db_suaracaleg";
+define("HOST", "localhost");
+define("USER", "root");
+define("PASSWORD", "");
+define("DATABASE", "db_rentalapp");
 
-$acak1 = "suara";
-$acak2 = "caleg";
+$acak1 = "rental";
+$acak2 = "lapangan";
 
-$conn = new PDO("pgsql:dbname=$dbname;host=$host", $dbuser, $dbpass); 
-
-if (!$conn) {
-	echo"Koneksi ke database gagal";
+$conn = new mysqli(HOST, USER, PASSWORD, DATABASE);
+if ($conn->connect_error) {
+    trigger_error("Koneksi ke database gagal: " . $conn->connect_error, E_USER_ERROR);
 }
 
 $inactive = 600; // Set timeout period in seconds

@@ -1,10 +1,24 @@
 var gulp = require('gulp');
+const browserSync = require('browser-sync').create();
+const reload = browserSync.reload;
+
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var cleanCSS = require('gulp-clean-css');
 const terser = require('gulp-terser');
 const imagemin = require('gulp-imagemin');
 const imagewebp = require('gulp-webp');
+
+gulp.task('browser-sync', function () {
+  browserSync.init({
+    proxy: "localhost/bookingonline", // Ganti sesuai URL lokal project kamu
+    notify: false,
+    open: false,
+    port: 3000
+  });
+
+  gulp.watch('./**/*.php').on('change', reload);
+});
 
 gulp.task('js:plugins', function () {
   return gulp.src(['./assets/js/main_plugins/*.js'])
@@ -71,46 +85,37 @@ gulp.task('webpImage', function () {
     .pipe(gulp.dest('./dist/images/'));
 });
 
-// gulp.task('webpImage:uploads', function () {
-//   return gulp.src('./pages/uploads/pictures/**/*')
-//     .pipe(imagemin([
-//       imagemin.mozjpeg({quality: 80, progressive: true}),
-//       imagemin.optipng({optiminzationLevel: 2})
-//     ]))
-//     .pipe(imagewebp())
-//     .pipe(gulp.dest('./dist/pictures/'));
-// });
-
 gulp.task('webpImage:uploads', function () {
   return gulp.src('./pages/uploads/pictures/**/*')
-    .pipe(gulpif(
-      function(file) {
-        // Membandingkan antara file asli dan file yang sudah di-optimize
-        return !fs.existsSync('./dist/pictures/' + file.relative);
-      },
-      // Proses file yang belum di-optimize
-      imagemin([
-        imagemin.mozjpeg({quality: 80, progressive: true}),
-        imagemin.optipng({optimizationLevel: 2})
-      ]),
-      // Membiarkan file yang sudah di-optimize tidak terproses ulang
-      gulp.src('./dist/pictures/**/*')
-    ))
+    .pipe(imagemin([
+      imagemin.mozjpeg({quality: 80, progressive: true}),
+      imagemin.optipng({optiminzationLevel: 2})
+    ]))
     .pipe(imagewebp())
     .pipe(gulp.dest('./dist/pictures/'));
 });
 
-
 gulp.task('watch', function () {
-  gulp.watch('./assets/js/main_plugins/*.js', gulp.series('js:plugins'));
-  gulp.watch('./assets/js/main_script/*.js', gulp.series('js:scripts'));
-  gulp.watch('./assets/js/main_pages/*.js', gulp.series('js:pages'));
-  gulp.watch('./assets/js/main_datatables/*.js', gulp.series('js:datatables'));
-  gulp.watch('./assets/css/style.css', gulp.series('css'));
-  gulp.watch('./assets/css/custom.css', gulp.series('css:custom'));
-  gulp.watch('./assets/css/plugins/*.css', gulp.series('css'));
-  gulp.watch('./assets/images/**/*', gulp.series('webpImage'));
-  gulp.watch('./pages/uploads/pictures/**/*', gulp.series('webpImage:uploads'));
+  gulp.watch('./assets/js/main_plugins/*.js', gulp.series('js:plugins')).on('change', reload);
+  gulp.watch('./assets/js/main_script/*.js', gulp.series('js:scripts')).on('change', reload);
+  gulp.watch('./assets/js/main_pages/*.js', gulp.series('js:pages')).on('change', reload);
+  gulp.watch('./assets/js/main_datatables/*.js', gulp.series('js:datatables')).on('change', reload);
+  gulp.watch('./assets/css/style.css', gulp.series('css')).on('change', reload);
+  gulp.watch('./assets/css/custom.css', gulp.series('css:custom')).on('change', reload);
+  gulp.watch('./assets/css/plugins/*.css', gulp.series('css')).on('change', reload);
+  gulp.watch('./assets/images/**/*', gulp.series('webpImage')).on('change', reload);
+  gulp.watch('./pages/uploads/pictures/**/*', gulp.series('webpImage:uploads')).on('change', reload);
 });
 
-gulp.task('default', gulp.series('js:plugins','js:scripts', 'js:pages', 'js:datatables',  'css', 'css:custom', 'webpImage','webpImage:uploads', 'watch'));
+
+gulp.task('default', gulp.series(
+  'js:plugins',
+  'js:scripts',
+  'js:pages',
+  'js:datatables',
+  'css',
+  'css:custom',
+  'webpImage',
+  'webpImage:uploads',
+  gulp.parallel('browser-sync', 'watch')
+));
