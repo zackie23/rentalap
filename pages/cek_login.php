@@ -27,7 +27,10 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
     if(isset($_POST['submit']) && $_POST['submit'] == "login"){
 
         
-        $sql = "SELECT * FROM tb_users WHERE email='$username' AND password='$pasacak' AND status=1";
+        $sql = "SELECT email,t1.name,password,is_active,role_id, t3.name as role_name
+        FROM tb_users t1 left join tb_user_roles t2 on t1.id = t2.user_id 
+        left join tb_roles t3 on t2.role_id=t3.id
+        WHERE email='$username' AND password='$pasacak' AND is_active=1";
         $hasil = $conn->query($sql);
         $ketemu = $hasil->num_rows;
         
@@ -43,11 +46,11 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
 
             $_SESSION['id_user'] = $r['email'];
             $_SESSION['email'] = $r['email'];
-            $_SESSION['namapengguna'] = $r['nama_lengkap'];
+            $_SESSION['namapengguna'] = $r['name'];
             $_SESSION['passuser'] = $r['password'];
-            $_SESSION['idlevel'] = $r['id_level'];
-            $_SESSION['status'] = $r['status'];
-            $_SESSION['namalevel'] = getUserLevel($r['id_level']);
+            $_SESSION['idlevel'] = $r['role_id'];
+            $_SESSION['status'] = $r['is_active'];
+            $_SESSION['namalevel'] = $r['is_active'];
             // session timeout
             $_SESSION['login'] = 1;
             timer();

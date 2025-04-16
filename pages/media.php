@@ -86,7 +86,7 @@ if($_SESSION['login'] != 1){
                                 ?>
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>Halaman tidak ditemukan!</h5>
+                                    <h5>Halaman/Modul tidak ditemukan!</h5>
                                     <hr>
                                 </div>
                                 <div class="card-body">

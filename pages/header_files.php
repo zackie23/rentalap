@@ -23,7 +23,7 @@
                             class="sr-only"></span></span></a>
                 <div class="dropdown-menu dropdown-menu-end notification">
                     <div class="noti-head">
-                        <h6 class="d-inline-block m-b-0">Notifications</h6>
+                        <h6 class="d-inline-block m-b-0">Notif</h6>
                         <div class="float-end">
                             <a href="#" class="m-r-10">mark as read</a>
                             <a href="#">clear all</a>

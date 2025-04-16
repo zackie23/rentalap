@@ -45,9 +45,8 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                                         <th>Email</th>
                                         <th>No HP</th>
                                         <th>Google</th>
-                                        <th>Tipe</th>
-                                        <th>Team Leader</th>
                                         <th>Roles</th>
+                                        <th>Team Leader</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -70,6 +69,9 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
             break;
         case "hapus":
             include "form.php";
+            break;
+        case "detail":
+            include "detail.php";
             break;
     }
 }
