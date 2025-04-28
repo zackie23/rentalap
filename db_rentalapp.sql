@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.0.4
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 28, 2025 at 04:05 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: Apr 28, 2025 at 04:33 AM
+-- Server version: 10.4.17-MariaDB
+-- PHP Version: 7.4.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `db_rentalapp`
+-- Database: `db_rentalapp_johan`
 --
 
 -- --------------------------------------------------------
@@ -42,7 +42,7 @@ CREATE TABLE `tb_bookings` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` varchar(50) NOT NULL,
   `updated_by` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -61,7 +61,7 @@ CREATE TABLE `tb_branches` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_branches`
@@ -83,7 +83,7 @@ CREATE TABLE `tb_data_error` (
   `waktu` datetime NOT NULL,
   `url` varchar(100) NOT NULL,
   `ip_address` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tb_data_error`
@@ -110,7 +110,7 @@ CREATE TABLE `tb_data_login` (
   `time_logout` datetime NOT NULL,
   `ip_address` varchar(16) NOT NULL,
   `type_browser` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tb_data_login`
@@ -140,15 +140,15 @@ CREATE TABLE `tb_fields` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_fields`
 --
 
 INSERT INTO `tb_fields` (`id`, `branch_id`, `name`, `sport_type`, `hourly_price`, `image_url`, `active`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
-(2, 2, 'lapangan bola', 'bola', 2.00, 'bola', 0, '2025-04-16 06:04:56', '2025-04-16 06:11:52', NULL, NULL),
-(3, 3, 'taman sari', 'bultang', 2.00, 'bola', 0, '2025-04-16 06:08:58', '2025-04-16 06:12:17', NULL, NULL);
+(2, 2, 'lapangan bola', 'bola', '2.00', 'bola', 0, '2025-04-16 06:04:56', '2025-04-16 06:11:52', NULL, NULL),
+(3, 3, 'taman sari', 'bultang', '2.00', 'bola', 0, '2025-04-16 06:08:58', '2025-04-16 06:12:17', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -164,7 +164,66 @@ CREATE TABLE `tb_operator` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` varchar(50) NOT NULL,
   `updated_by` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_owners`
+--
+
+CREATE TABLE `tb_owners` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `business_name` varchar(100) NOT NULL,
+  `status` enum('active','suspended','pending') DEFAULT 'pending',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_by` varchar(50) DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_owners`
+--
+
+INSERT INTO `tb_owners` (`id`, `user_id`, `business_name`, `status`, `verified_at`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
+(1, 8, 'Yasser Sport', 'pending', NULL, '2025-04-18 03:55:07', '2025-04-18 03:55:07', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_packages`
+--
+
+CREATE TABLE `tb_packages` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `max_fields` int(11) DEFAULT 2,
+  `max_branches` int(11) DEFAULT 1,
+  `price` int(11) DEFAULT NULL,
+  `duration_days` int(11) DEFAULT 30,
+  `description` text DEFAULT NULL,
+  `is_trial` tinyint(1) NOT NULL,
+  `is_recommended` tinyint(1) NOT NULL,
+  `is_visible` tinyint(1) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_by` varchar(50) DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_packages`
+--
+
+INSERT INTO `tb_packages` (`id`, `name`, `max_fields`, `max_branches`, `price`, `duration_days`, `description`, `is_trial`, `is_recommended`, `is_visible`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
+(2, 'Basic', 2, 1, 0, 0, 'Paket gratis untuk pengguna baru', 1, 0, 1, '2025-04-18 07:22:47', '2025-04-18 07:22:47', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
+(3, 'Standard', 5, 3, 99000, 30, 'Cocok untuk penyewa lapangan kecil', 0, 0, 1, '2025-04-18 07:22:47', '2025-04-18 07:22:47', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
+(4, 'Pro', 10, 5, 199000, 30, 'Paket lengkap untuk UKM', 0, 1, 1, '2025-04-18 07:22:47', '2025-04-18 07:22:47', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
+(5, 'Business', 30, 10, 499000, 90, 'Untuk bisnis skala menengah', 0, 0, 1, '2025-04-18 07:22:47', '2025-04-18 07:24:03', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
+(6, 'Enterprise', 999, 999, 999000, 365, 'Paket untuk perusahaan besar', 0, 0, 1, '2025-04-18 07:22:47', '2025-04-18 07:23:46', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com');
 
 -- --------------------------------------------------------
 
@@ -184,7 +243,7 @@ CREATE TABLE `tb_payment` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` varchar(50) NOT NULL,
   `updated_by` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -199,7 +258,7 @@ CREATE TABLE `tb_roles` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` varchar(50) NOT NULL,
   `updated_by` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_roles`
@@ -210,6 +269,25 @@ INSERT INTO `tb_roles` (`id`, `name`, `created_at`, `updated_at`, `created_by`, 
 (2, 'Owner', '2025-04-16 04:35:02', '2025-04-16 04:35:02', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
 (3, 'Operator', '2025-04-16 04:35:08', '2025-04-16 04:35:08', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com'),
 (4, 'User', '2025-04-16 04:35:12', '2025-04-16 04:35:12', 'zackie23@rocketmail.com', 'zackie23@rocketmail.com');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_subscriptions`
+--
+
+CREATE TABLE `tb_subscriptions` (
+  `id` int(11) NOT NULL,
+  `id_owner` bigint(20) UNSIGNED NOT NULL,
+  `id_package` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_by` varchar(50) DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -225,7 +303,7 @@ CREATE TABLE `tb_teams` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -243,7 +321,7 @@ CREATE TABLE `tb_team_members` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -261,7 +339,7 @@ CREATE TABLE `tb_tickets` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` varchar(50) DEFAULT NULL,
   `updated_by` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -278,7 +356,7 @@ CREATE TABLE `tb_ticket_messages` (
   `attachment_url` varchar(255) DEFAULT NULL,
   `crated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -299,7 +377,7 @@ CREATE TABLE `tb_users` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_users`
@@ -324,7 +402,7 @@ CREATE TABLE `tb_user_roles` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` bigint(20) DEFAULT NULL,
   `updated_by` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_user_roles`
@@ -379,6 +457,18 @@ ALTER TABLE `tb_operator`
   ADD UNIQUE KEY `branch_id` (`branch_id`);
 
 --
+-- Indexes for table `tb_owners`
+--
+ALTER TABLE `tb_owners`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tb_packages`
+--
+ALTER TABLE `tb_packages`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tb_payment`
 --
 ALTER TABLE `tb_payment`
@@ -391,6 +481,14 @@ ALTER TABLE `tb_payment`
 --
 ALTER TABLE `tb_roles`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tb_subscriptions`
+--
+ALTER TABLE `tb_subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_owner` (`id_owner`),
+  ADD KEY `id_package` (`id_package`);
 
 --
 -- Indexes for table `tb_teams`
@@ -476,6 +574,18 @@ ALTER TABLE `tb_operator`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tb_owners`
+--
+ALTER TABLE `tb_owners`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tb_packages`
+--
+ALTER TABLE `tb_packages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT for table `tb_payment`
 --
 ALTER TABLE `tb_payment`
@@ -486,6 +596,12 @@ ALTER TABLE `tb_payment`
 --
 ALTER TABLE `tb_roles`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tb_subscriptions`
+--
+ALTER TABLE `tb_subscriptions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tb_teams`
