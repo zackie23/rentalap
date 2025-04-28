@@ -1,48 +1,37 @@
 <?php
-
-// fungsi enkripsi base64 dengan key
 function base64_encrypt($plain_text, $password, $iv_len = 16) {
-    $plain_text .= "\x13";
-    $n = strlen($plain_text);
-    if ($n % 16)
-        $plain_text .= str_repeat("\0", 16 - ($n % 16));
-    $i = 0;
-    $enc_text = get_rnd_iv($iv_len);
-    $iv = substr($password ^ $enc_text, 0, 512);
-    while ($i < $n) {
-        $block = substr($plain_text, $i, 16) ^ pack('H*', md5($iv));
-        $enc_text .= $block;
-        $iv = substr($block . $iv, 0, 512) ^ $password;
-        $i += 16;
-    }
-    $hasil = base64_encode($enc_text);
+    // Kunci 256-bit dari password
+    $key = hash('sha256', $password, true);
+    $iv = random_bytes($iv_len);
+
+    // Enkripsi dengan AES-256-CBC
+    $encrypted = openssl_encrypt($plain_text, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+
+    // Gabungkan IV + ciphertext, lalu encode base64
+    $hasil = base64_encode($iv . $encrypted);
+
+    // Ganti + dengan @ (opsional, sesuai versi awal kamu)
     return str_replace('+', '@', $hasil);
 }
 
-// fungsi base64 decrypt
-// untuk mendekripsi string base64
 function base64_decrypt($enc_text, $password, $iv_len = 16) {
+    // Balikkan @ ke +
     $enc_text = str_replace('@', '+', $enc_text);
     $enc_text = base64_decode($enc_text);
-    $n = strlen($enc_text);
-    $i = $iv_len;
-    $plain_text = '';
-    $iv = substr($password ^ substr($enc_text, 0, $iv_len), 0, 512);
-    while ($i < $n) {
-        $block = substr($enc_text, $i, 16);
-        $plain_text .= $block ^ pack('H*', md5($iv));
-        $iv = substr($block . $iv, 0, 512) ^ $password;
-        $i += 16;
+    if ($enc_text === false || strlen($enc_text) < $iv_len) {
+        return false;
     }
-    return preg_replace('/\\x13\\x00*$/', '', $plain_text);
+
+    // Ekstrak IV dan ciphertext
+    $iv = substr($enc_text, 0, $iv_len);
+    $ciphertext = substr($enc_text, $iv_len);
+
+    // Kunci 256-bit dari password
+    $key = hash('sha256', $password, true);
+
+    // Dekripsi
+    return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
 }
 
-function get_rnd_iv($iv_len) {
-    $iv = '';
-    while ($iv_len-- > 0) {
-        $iv .= chr(mt_rand() & 0xff);
-    }
-    return $iv;
-}
 
 ?>
