@@ -34,18 +34,24 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                 ?>
                 <div class="card">
                     <div class="card-header">
-                        <h5><a href="<?=$module."?act=new"?>" class="btn bt-sm btn-primary"><i class="fa fa-plus"></i> New Entry</a></h5>
+                        <h5><a href="<?=$module."?act=new"?>" class="btn bt-sm btn-primary"><i class="fa fa-plus"></i> Tambah Data</a></h5>
                     </div>
                     <div class="card-body table-border-style">
                         <div class="table-responsive">
-                            <table id="table-<?=$module?>" class="table table-striped table-bordered nowrap">
+                            <table id="table-<?=$module?>" class="table table-striped table-bordered nowrap fs-6">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
-                                        <th>Provinsi</th>
-                                        <th>Kab/Kota</th>
-                                        <th>Id. Kecamatan</th>
-                                        <th>Kecamatan</th>
+                                        <th>No</th>
+                                        <th>Nama Paket</th>
+                                        <th>Cabang (Maks)</th>
+                                        <th>Lapangan (Maks)</th>
+                                        <th>Harga</th>
+                                        <th>Durasi</th>
+                                        <th>Keterangan</th>
+                                        <th>Trial</th>
+                                        <th>Rekomendasi</th>
+                                        <th>Tampilkan</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -55,6 +61,21 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                 </div>
                 <?php
             }
+            break;
+        case "new":
+            include "form.php";
+            break;
+        case "edit":
+            include "form.php";
+            break;
+        case "save":
+            include "form.php";
+            break;
+        case "hapus":
+            include "form.php";
+            break;
+        case "detail":
+            include "detail.php";
             break;
     }
 }

@@ -34,17 +34,19 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                 ?>
                 <div class="card">
                     <div class="card-header">
-                        <h5><a href="<?=$module."?act=new"?>" class="btn bt-sm btn-primary"><i class="fa fa-plus"></i> New Entry</a></h5>
+                        <h5><a href="<?=$module."?act=new"?>" class="btn bt-sm btn-primary"><i class="fa fa-plus"></i> Tambah Data</a></h5>
                     </div>
                     <div class="card-body table-border-style">
                         <div class="table-responsive">
                             <table id="table-<?=$module?>" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
-                                        <th style="width:50px">Gambar</th>
-                                        <th>Nama Partai</th>
-                                        <th>Singkatan</th>
-                                        <th>Hex Color</th>
+                                        <th>Nama Pengguna</th>
+                                        <th>Email</th>
+                                        <th>No HP</th>
+                                        <th>Google</th>
+                                        <th>Roles</th>
+                                        <th>Team Leader</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -67,6 +69,9 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
             break;
         case "hapus":
             include "form.php";
+            break;
+        case "detail":
+            include "detail.php";
             break;
     }
 }

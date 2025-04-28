@@ -27,9 +27,9 @@
 
                     <!-- Paket & Langganan -->
                     <li class="nav-item">
-                        <a href="paket" class="nav-link">
+                        <a href="subcriptions" class="nav-link">
                             <span class="pcoded-micon"><i class="feather icon-package"></i></span>
-                            <span class="pcoded-mtext">Paket & Langganan</span>
+                            <span class="pcoded-mtext">Subcriptions</span>
                         </a>
                     </li>
 
@@ -65,6 +65,7 @@
                         </a>
                         <ul class="pcoded-submenu">
                             <li><a href="pengaturan_umum">Pengaturan Umum</a></li>
+                            <li><a href="paket_langganan">Paket Langganan</a></li>
                             <li><a href="roles">Manajemen Hak Akses</a></li>
                             <li><a href="pengguna">Manajemen Pengguna</a></li>
                             <li><a href="notifikasi">Pengaturan Notifikasi</a></li>

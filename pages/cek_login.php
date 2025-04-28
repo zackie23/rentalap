@@ -130,6 +130,62 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
             }
         }
 
+    }elseif(isset($_POST['submit']) && $_POST['submit'] == "signup_venue"){
+        //mengecek apakah email sudah terdaftar atau belum.
+        $sql = "SELECT * FROM tb_users WHERE email='$username'";
+        $hasil = $conn->query($sql);
+        $ketemu = $hasil->num_rows;
+        $r = $hasil->fetch_assoc();
+
+        if ($ketemu > 0) {
+            // Email terdaftar arahkan user untuk login /auth
+            $error = "Maaf! Email sudah terdaftar, silahkan login.";
+        } else {
+            if (isset($_COOKIE['referral'])) {
+                $referral = $_COOKIE['referral'];
+            } else {
+                $referral = "";
+            }
+
+            $nama_lengkap   = anti_injection($_POST['nama_lengkap']);
+            $business_name  = anti_injection($_POST['business_name']);
+            $no_handphone   = anti_injection($_POST['no_handphone']);
+            $username       = anti_injection($username);
+            $pasacak        = anti_injection($pasacak);
+
+            $conn->begin_transaction();
+
+            try {
+                // Simpan user
+                $query = "INSERT INTO tb_users (email, password, name, phone) 
+                        VALUES ('$username', '$pasacak', '$nama_lengkap', '$no_handphone')";
+                if (!$conn->query($query)) {
+                    throw new Exception("Gagal mendaftarkan user: " . $conn->error);
+                }
+
+                // Ambil ID user baru
+                $new_user_id = $conn->insert_id;
+
+                // Simpan data owner
+                $query_owner = "INSERT INTO tb_owners (user_id, business_name) 
+                                VALUES ('$new_user_id', '$business_name')";
+                if (!$conn->query($query_owner)) {
+                    throw new Exception("Gagal menyimpan data owner: " . $conn->error);
+                }
+
+                // Commit transaksi
+                $conn->commit();
+                $success = "Loading..";
+
+            } catch (Exception $e) {
+                // Rollback jika gagal
+                $conn->rollback();
+                $conn->query("INSERT INTO tb_data_error (email, waktu, url, ip_address) 
+                            VALUES ('$username', NOW(), '$link;Registration Failed!', '$ip;$browser')");
+                $error = "Maaf, proses registrasi tidak berhasil!";
+            }
+        }
+
     }elseif(isset($_POST['submit']) && $_POST['submit'] == "reset"){
 
     }
