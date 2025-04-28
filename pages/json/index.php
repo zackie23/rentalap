@@ -122,6 +122,104 @@ if($module == "pengguna"){
 	else{	
 		$output['data'] = [];
 	}
+}elseif($module=="cabang"){
+    if($search!=""){
+		$filter	=	"	WHERE name like '%$search%'
+						";
+	}
+
+    $order1 = " order by id";
+
+    $query1 = "	select *,
+					ROW_NUMBER() OVER (".$order1.") AS no_urut	
+				    from tb_branches
+				";
+
+    $query  =   "select * from (".$query1." ".$filter." )xxx";
+    $stid1 = $conn->query("".$query." WHERE xxx.no_urut>='$rownumawal' and xxx.no_urut<='$rownumakhir' ");
+
+    $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
+    
+    $hasil2 = $query_jumlah->fetch_assoc();
+    
+    $iFilteredTotal = $hasil2['jumlah'];
+    $iTotal = $iFilteredTotal;
+    $output = array(
+		"iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal	
+    );    
+    $a=0;
+	if($iFilteredTotal>0){
+        while ( $hasil1 = $stid1->fetch_assoc())
+        {   
+            $id = base64_encrypt($hasil1['id'],$key);
+            $row 	= array();
+            $row[]  = $rownumawal+$a;
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['address'];
+            $row[]	= $hasil1['city'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= '<div class="btn-group btn-group-sm">
+            <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+            <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>';
+            $output['data'][] = $row;
+            $a++;
+        }
+    }
+	else{	
+		$output['data'] = [];
+	}
+}elseif($module=="lapangan"){
+    if($search!=""){
+		$filter	=	"	WHERE name like '%$search%'
+						";
+	}
+
+    $order1 = " order by id";
+
+    $query1 = "	select t1.id, t1.name, sport_type, hourly_price,image_url,active, t2.name as nama_cabang,
+					ROW_NUMBER() OVER (".$order1.") AS no_urut	
+				    from tb_fields t1 left join tb_branches t2 on t1.branch_id = t2.id
+				";
+
+    $query  =   "select * from (".$query1." ".$filter." )xxx";
+    $stid1 = $conn->query("".$query." WHERE xxx.no_urut>='$rownumawal' and xxx.no_urut<='$rownumakhir' ");
+
+    $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
+    
+    $hasil2 = $query_jumlah->fetch_assoc();
+    
+    $iFilteredTotal = $hasil2['jumlah'];
+    $iTotal = $iFilteredTotal;
+    $output = array(
+		"iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal	
+    );    
+    $a=0;
+	if($iFilteredTotal>0){
+        while ( $hasil1 = $stid1->fetch_assoc())
+        {   
+            $id = base64_encrypt($hasil1['id'],$key);
+            $row 	= array();
+            $row[]  = $rownumawal+$a;
+            $row[]	= $hasil1['nama_cabang'];
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['sport_type'];
+            $row[]	= $hasil1['hourly_price'];
+            $row[]	= $hasil1['image_url'];
+            $row[]	= $hasil1['active'];
+            $row[]	= '<div class="btn-group btn-group-sm">
+            <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+            <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>';
+            $output['data'][] = $row;
+            $a++;
+        }
+    }
+	else{	
+		$output['data'] = [];
+	}
 }elseif($module=="kabkota" || $module == "kecamatan" || $module == "desa_kelurahan" || $module == "provinsi"){
     if($search!=""){
 		$filter	=	"	WHERE 	(nama_provinsi like '%$search%'
