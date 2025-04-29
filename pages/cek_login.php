@@ -74,7 +74,7 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
         }
     }elseif(isset($_POST['submit']) && $_POST['submit'] == "signup"){
         //mengecek apakah email sudah terdaftar atau belum.
-        $sql = "SELECT * FROM tb_user WHERE email='$username'";
+        $sql = "SELECT * FROM tb_users WHERE email='$username'";
 
         $hasil = $conn->query($sql);
         $ketemu = $hasil->num_rows;
@@ -92,38 +92,38 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
             $nama_lengkap = anti_injection($_POST['nama_lengkap']);
             $no_handphone = anti_injection($_POST['no_handphone']);
 
-            $insert = $conn->query("INSERT into tb_user (email,password,nama_lengkap,no_handphone,token,referral) 
-                                 VALUES ('$username','$pasacak','$nama_lengkap','$no_handphone','$token','$referral')");
+            $insert = $conn->query("INSERT into tb_users (email,password,name,phone,created_by) 
+                                 VALUES ('$username','$pasacak','$nama_lengkap','$no_handphone','$username')");
             
             if($insert){
                 //Kirim Email Konfirmasi Ke User!
-                $to      = $username; // Send email to our user
-                $subject = 'Signup | Verification'; // Give the email a subject 
-                $message = '
+                // $to      = $username; // Send email to our user
+                // $subject = 'Signup | Verification'; // Give the email a subject 
+                // $message = '
 
-                Thanks for signing up!
-                Your account has been created, you can login with the following credentials after you have activated your account by pressing the url below.
+                // Thanks for signing up!
+                // Your account has been created, you can login with the following credentials after you have activated your account by pressing the url below.
 
-                ------------------------
-                Username: '.$username.'
-                Password: '.$pass.'
-                ------------------------
+                // ------------------------
+                // Username: '.$username.'
+                // Password: '.$pass.'
+                // ------------------------
 
-                Please click this link to activate your account:
-                http://apps.bookingonline.com/pages/verify?email='.$username.'&hash='.$token.'
+                // Please click this link to activate your account:
+                // http://apps.bookingonline.com/pages/verify?email='.$username.'&hash='.$token.'
 
-                '; // Our message above including the link
+                // '; // Our message above including the link
                                     
-                $headers = 'From:noreply@bookingonline.com' . "\r\n"; // Set from headers
-                $kirim = mail($to, $subject, $message, $headers);
+                // $headers = 'From:noreply@bookingonline.com' . "\r\n"; // Set from headers
+                // $kirim = mail($to, $subject, $message, $headers);
 
-                if($kirim){
-                    $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
-                }else{
-                    $error = "Maaf, proses registrasi tidak berhasil!";
-                }
+                // if($kirim){
+                //     $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
+                // }else{
+                //     $error = "Maaf, proses registrasi tidak berhasil!";
+                // }
 
-                // $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
+                $success = "Registrasi berhasil, Link konfirmasi email berhasil dikirim ke ".$username;
             }else{
                 $conn->query("INSERT INTO tb_data_error (email,waktu,url,ip_address) VALUES ('$username',NOW(),'$link;Registration Failed!','$ip;$browser') ");
                 $error = "Maaf, proses registrasi tidak berhasil!";
@@ -157,8 +157,8 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
 
             try {
                 // Simpan user
-                $query = "INSERT INTO tb_users (email, password, name, phone) 
-                        VALUES ('$username', '$pasacak', '$nama_lengkap', '$no_handphone')";
+                $query = "INSERT INTO tb_users (email, password, name, phone, created_by) 
+                        VALUES ('$username', '$pasacak', '$nama_lengkap', '$no_handphone', '$username')";
                 if (!$conn->query($query)) {
                     throw new Exception("Gagal mendaftarkan user: " . $conn->error);
                 }
