@@ -314,13 +314,9 @@
         </ul>
         <div class="card text-center">
             <div class="card-block">
-                <i class="feather icon-package f-40 text-danger"></i>
-                <!-- <img src="../dist/images/kotak_pemilu.webp" width="75" alt="">
-                <h6 class="mt-3" id="timer" style="height:60px">
-                    <div class="spinner-border mt-2" style="width: 2rem; height: 2rem;" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </h6> -->
+                <a href="../master_template/bootstrap/default/navigation/index.html" target="blank">
+                    <i class="feather icon-package f-40 text-danger"></i>
+                </a>
             </div>
         </div>
     </div>
