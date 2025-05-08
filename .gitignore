@@ -1,4 +1,5 @@
-assets
+/assets/
+!master_template/bootstrap/doc/assets/
 node_modules
 pages/uploads/*
 ch0npi9/koneksi.php
