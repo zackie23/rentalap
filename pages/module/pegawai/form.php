@@ -17,11 +17,11 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
         
 
         $name = filter($_POST['name']);
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-        $phone = $_POST['phone'];
-        $business_name = $_POST['business_name'];
-        $status = $_POST['status'];
+        $email = filter($_POST['email']);
+        $phone = filter($_POST['phone']);
+        $roles = filter($_POST['roles']);
+        $branches = filter($_POST['branches']);
+
 
         $is_active = filter($_POST['is_active']);
         $created_by = $_SESSION['id_user'];
@@ -30,16 +30,14 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
         // Hash password jika ada
         $password = md5($acak1 . md5(filter($_POST['password'])) . $acak2);
 
-
         if (isset($_POST['Simpan'])) {
             // Mulai transaksi
             $conn->begin_transaction();
 
             try {
                 // Simpan user
-                $query = "INSERT INTO tb_users
-                                (name, email, password, phone, is_active, created_by, updated_by)
-                        VALUES ('$name', '$email', '$password', '$phone', 1, '$created_by', '$updated_by')";
+                $query = "INSERT INTO tb_users (name, email, password, phone, is_active, created_by, updated_by)
+                        VALUES ('$name', '$email', '$password', '$phone', '$is_active', '$created_by', '$updated_by')";
                 
                 if (!$conn->query($query)) {
                     throw new Exception("Gagal menyimpan user: " . $conn->error);
@@ -49,14 +47,8 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                 $new_user_id = $conn->insert_id;
 
 
-                $query_role = "INSERT INTO tb_user_roles (user_id, role_id , created_by, updated_by)
-                            VALUES ('$new_user_id', 2, '$created_by', '$updated_by')";
-
-                if (!$conn->query($query_role)) {
-                    throw new Exception("Gagal menyimpan role: " . $conn->error);
-                }
-                $query_role = "INSERT INTO tb_owners (user_id, business_name, status, created_by, updated_by)
-                            VALUES ('$new_user_id', '$business_name','pending', '$created_by', '$updated_by')";
+                $query_role = "INSERT INTO tb_user_roles (user_id, role_id, branch_id, created_by, updated_by)
+                            VALUES ('$new_user_id', '$roles','$branches', '$created_by', '$updated_by')";
 
                 if (!$conn->query($query_role)) {
                     throw new Exception("Gagal menyimpan role: " . $conn->error);
@@ -82,24 +74,36 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
 
                 // Update tb_users
                 $query = "UPDATE tb_users 
-                        SET name='$name', email='$email', phone='$phone', updated_by='$updated_by'
+                        SET name='$name', email='$email', phone='$phone', is_active='$is_active', updated_by='$updated_by'
                         $q_password $q_avatar 
                         WHERE id='$idb'";
                 
                 if (!$conn->query($query)) {
                     throw new Exception("Gagal update user: " . $conn->error);
                 }
-                
-                // Update tb_users
-                $query = "UPDATE tb_owners
-                        SET business_name='$business_name', status='$status', updated_by='$updated_by'
-                        WHERE user_id='$idb'";
-                
-                if (!$conn->query($query)) {
-                    throw new Exception("Gagal update user: " . $conn->error);
-                }
-                
 
+                // Update tb_user_roles (asumsi kamu ingin ganti role-nya juga)
+                $query_check_role = "SELECT id FROM tb_user_roles WHERE user_id = '$idb'";
+                $result_check = $conn->query($query_check_role);
+
+                if ($result_check->num_rows > 0) {
+                    // Sudah ada -> update role
+                    $query_role = "UPDATE tb_user_roles 
+                                SET role_id = '$roles',
+                                 branch_id = '$branches',
+                                 updated_by = '$updated_by' 
+                                WHERE user_id = '$idb'";
+                } else {
+                    // Belum ada -> insert baru
+                    $query_role = "INSERT INTO tb_user_roles (user_id, role_id, branch_id, created_by, updated_by)
+                                VALUES ('$idb', '$roles','$branches', '$updated_by', '$updated_by')";
+                }
+
+                if (!$conn->query($query_role)) {
+                    throw new Exception("Gagal update/insert role: " . $conn->error);
+                }
+
+                // Commit transaksi
                 $conn->commit();
                 save_alert_swall('save', 'Data berhasil diupdate');
 
@@ -122,16 +126,16 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
     } else {
         if ($_GET['act'] != "new") {
             $idb = base64_decrypt($_GET['id'], $key);
-            $data = $conn->query("SELECT * FROM tb_users t1
-                                     join tb_owners  t2 on t1.id = t2.user_id
-                                     WHERE t1.id='$idb'")->fetch_assoc();
+            $data = $conn->query("SELECT * FROM tb_users t1 
+                                    join tb_user_roles t2 on t1.id = t2.user_id 
+                                    WHERE t1.id='$idb'")->fetch_assoc();
 
             $name = $data['name'];
             $email = $data['email'];
-            $password = $data['password'];
             $phone = $data['phone'];
-            $business_name = $data['business_name'];
-            $status = $data['status'];
+            $role_id = $data['role_id'];
+            $branch_id= $data['branch_id'];
+            $is_active = $data['is_active'];
             $avatar_url = $data['avatar_url'];
         } else {
             $idb = "";
@@ -152,7 +156,7 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                     <div class="card-header"><h5 class="text-muted"><?= $title ?></h5><hr></div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label>Nama Owner</label>
+                            <label>Nama Lengkap</label>
                             <input type="text" name="name" class="form-control" value="<?= $name ?>" required <?= $readonly ?>>
                         </div>
                         <div class="form-group">
@@ -160,23 +164,51 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                             <input type="email" name="email" class="form-control" value="<?= $email ?>" required <?= $readonly ?>>
                         </div>
                         <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control" required <?= $readonly ?>>
+                            <label>Telepon</label>
+                            <input type="text" name="phone" class="form-control" value="<?= $phone ?>" <?= $readonly ?>>
                         </div>
                         <div class="form-group">
-                            <label>Phone</label>
-                            <input type="text" name="phone" class="form-control" value="<?= $phone?>" <?= $readonly ?>>
+                            <label>Password (Kosongkan jika tidak diubah)</label>
+                            <input type="password" name="password" class="form-control" <?= $readonly ?>>
                         </div>
                         <div class="form-group">
-                            <label>Nama Business</label>
-                            <input type="text" name="business_name" class="form-control" value="<?= $business_name ?>" <?= $readonly ?>>
+                            <label>Cabang </label>
+                            <select name="branches" class="form-control" <?= $readonly ?>>
+                                <?php
+                                    $query = "SELECT * from tb_branches";
+                                    $exec = $conn->query($query);
+                                    while($row = $exec->fetch_assoc()){
+                                        if($branch_id == $row['id']){
+                                            echo '<option value="'.$row['id'].'" selected>'.$row['name'].'</option>';
+                                        }else{
+                                            echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                        }
+                                        
+                                    }
+                                ?>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Roles</label>
+                            <select name="roles" id="role_id" class="form-control" <?= $readonly ?>>
+                                <?php
+                                    $query = "SELECT * from tb_roles where id in (3,4)";
+                                    $exec = $conn->query($query);
+                                    while($row = $exec->fetch_assoc()){
+                                        echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                    }
+                                ?>
+                            </select>
+                            <script>
+                                 var role_id = <?=json_encode($role_id)?>;
+                                 document.getElementById("role_id").value=role_id;
+                            </script>
                         </div>
                         <div class="form-group">
                             <label>Status</label>
                             <select name="is_active" class="form-control" <?= $readonly ?>>
-                                <option value="Active" <?= $is_active == 'Active' ? "selected" : "" ?>>Active</option>
-                                <option value="Pending" <?= $is_active == 'Pending' ? "selected" : "" ?>>Pending</option>
-                                <option value="Suspend" <?= $is_active == 'Suspend' ? "selected" : "" ?>>Suspend</option>
+                                <option value="1" <?= $is_active == 1 ? "selected" : "" ?>>Aktif</option>
+                                <option value="0" <?= $is_active == 0 ? "selected" : "" ?>>Tidak Aktif</option>
                             </select>
                         </div>
                     </div>
@@ -186,8 +218,7 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                     </div>
                 </div>
             </form>
-        </div>
-        <div class="col-md-3">
+        </div>  <div class="col-md-3">
             <div class="card">
                 <div class="card-header"><h5 class="text-muted">Foto Profil</h5><hr></div>
                 <div class="card-body text-center">

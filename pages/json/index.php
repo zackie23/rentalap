@@ -77,6 +77,179 @@ if($module == "pengguna"){
 	else{	
 		$output['data'] = [];
 	}	    
+}elseif($module == "pegawai"){
+    if($search!=""){
+		$filter	=	"	WHERE 	(t1.name like '%$search%'
+								or email like '%$search%'
+                                or phone like '%$search%'
+								)
+						";
+	}
+
+    $order1 = " order by t1.name ";
+
+    $query1 = "	select t1.id,t1.name,t1.email,t1.phone,t3.name as name_role, t4.name as nama_cabang,
+					ROW_NUMBER() OVER (".$order1.") AS no_urut	
+				    from tb_users t1 
+                    left join tb_user_roles t2 on t1.id=t2.user_id
+                    left join tb_roles t3 on t3.id=t2.role_id
+                    left join tb_branches t4 on t2.branch_id = t4.id
+                    where t2.role_id in (3,4) 
+				";
+
+    $query  =   "select * from (".$query1." ".$filter." )xxx";
+    $stid1 = $conn->query("".$query." WHERE xxx.no_urut>='$rownumawal' and xxx.no_urut<='$rownumakhir' ");
+
+    $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
+    
+    $hasil2 = $query_jumlah->fetch_assoc();
+    
+    $iFilteredTotal = $hasil2['jumlah'];
+    $iTotal = $iFilteredTotal;
+    $output = array(
+		"iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal	
+    );    
+    $a=1;
+	if($iFilteredTotal>0){
+        while ( $hasil1 = $stid1->fetch_assoc())
+        {   
+            $id = base64_encrypt($hasil1['id'],$key);
+            $lambang = explode(".",$hasil1['lambang']);
+            $lambang = ($lambang[0] !="") ? "../dist/pictures/partai_politik/".$lambang[0].".webp" : "https://via.placeholder.com/50";
+            $row 	= array();
+            // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['email'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['name_role'];
+            $row[]	= $hasil1['nama_cabang'];
+
+            $row[]	= '<div class="btn-group btn-group-sm">
+            <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+            <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>';
+            $output['data'][] = $row;
+
+            $a++;
+        }
+    }
+	else{	
+		$output['data'] = [];
+	}	    
+}elseif($module == "owner"){
+    if($search!=""){
+		$filter	=	"	WHERE 	(t1.name like '%$search%'
+								or email like '%$search%'
+                                or phone like '%$search%'
+								)
+						";
+	}
+
+    $order1 = " order by t1.name ";
+
+    $query1 = "     select t1.id,t1.name,t1.email,t1.phone, t4.business_name, t4.status,
+                    ROW_NUMBER() OVER (".$order1.") AS no_urut
+				    from tb_owners t4
+                    left join tb_users t1 on t1.id=t4.user_id
+				";
+
+    $query  =   "select * from (".$query1." ".$filter." )xxx";
+    $stid1 = $conn->query("".$query." WHERE xxx.no_urut>='$rownumawal' and xxx.no_urut<='$rownumakhir' ");
+
+    $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
+    
+    $hasil2 = $query_jumlah->fetch_assoc();
+    
+    $iFilteredTotal = $hasil2['jumlah'];
+    $iTotal = $iFilteredTotal;
+    $output = array(
+		"iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal	
+    );    
+    $a=1;
+	if($iFilteredTotal>0){
+        while ( $hasil1 = $stid1->fetch_assoc())
+        {   
+            $id = base64_encrypt($hasil1['id'],$key);
+            $lambang = explode(".",$hasil1['lambang']);
+            $lambang = ($lambang[0] !="") ? "../dist/pictures/partai_politik/".$lambang[0].".webp" : "https://via.placeholder.com/50";
+            $row 	= array();
+            // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['email'];
+            $row[]	= $hasil1['password'];
+            $row[]	= $hasil1['phone'];
+            $row[]	= $hasil1['business_name'];
+            $row[]	= $hasil1['status'];
+
+            $row[]	= '<div class="btn-group btn-group-sm">
+            <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+            <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>';
+            $output['data'][] = $row;
+
+            $a++;
+        }
+    }
+	else{	
+		$output['data'] = [];
+	}	    
+}elseif($module == "subcriptions"){
+    if($search!=""){
+		$filter	=	"	WHERE 	(t2.business_name like '%$search%'
+								or t3.name like '%$search%'
+								)
+						";
+	}
+
+    $order1 = " order by t2.business_name ";
+
+    $query1 = "     select t1.id, t2.business_name, t3.name , t3.duration_days, t1.end_date, t1.is_active,
+                    ROW_NUMBER() OVER (".$order1.") AS no_urut
+				    from tb_subscriptions t1 
+                    left join tb_owners t2 on t1.id_owner = t2.id
+                    left join tb_packages t3 on t1.id_package = t3.id
+				";
+
+    $query  =   "select * from (".$query1." ".$filter." )xxx";
+    $stid1 = $conn->query("".$query." WHERE xxx.no_urut>='$rownumawal' and xxx.no_urut<='$rownumakhir' ");
+
+    $query_jumlah = $conn->query("SELECT COUNT(*) as jumlah FROM  (".$query.") xxx ");
+    
+    $hasil2 = $query_jumlah->fetch_assoc();
+    
+    $iFilteredTotal = $hasil2['jumlah'];
+    $iTotal = $iFilteredTotal;
+    $output = array(
+		"iTotalRecords" => $iTotal,
+        "iTotalDisplayRecords" => $iFilteredTotal	
+    );    
+    $a=1;
+	if($iFilteredTotal>0){
+        while ( $hasil1 = $stid1->fetch_assoc())
+        {   
+            $id = base64_encrypt($hasil1['id'],$key);
+            $row 	= array();
+            // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
+            $row[]	= $hasil1['business_name'];
+            $row[]	= $hasil1['name'];
+            $row[]	= $hasil1['duration_days'];
+            $row[]	= $hasil1['end_date'];
+            $row[]	= $hasil1['is_active'];
+
+            $row[]	= '<div class="btn-group btn-group-sm">
+            <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+            <a href="'.$module.'?act=hapus&id='.$id.'" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>';
+            $output['data'][] = $row;
+
+            $a++;
+        }
+    }
+	else{	
+		$output['data'] = [];
+	}	    
 }elseif($module=="paket_langganan"){
     if($search!=""){
 		$filter	=	"	WHERE name like '%$search%'

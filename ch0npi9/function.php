@@ -176,4 +176,17 @@ function sentEmail($toEmail,$nama_user,$type){
 
     }
 }
+
+function getExpiredDate(int $days)
+{
+    if ($days === 0) {
+        return 0;
+    }
+
+    $now = new DateTime();
+    $now->modify("+{$days} days");
+    
+    return $now->format('Y-m-d');
+}
+
 ?>
