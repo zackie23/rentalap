@@ -41,11 +41,10 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                             <table id="table-<?=$module?>" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
-                                        <th>Nama Owner</th>
-                                        <th>Email</th>
-                                        <th>Password</th>
-                                        <th>Phone</th>
                                         <th>Nama Business</th>
+                                        <th>Nama Package</th>
+                                        <th>Durasi</th>
+                                        <th>Expired at</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>

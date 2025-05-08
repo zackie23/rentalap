@@ -13,7 +13,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
     switch ($_GET['act']) {
         // Tampil List pengguna
         default:
-            if ($_SESSION['idlevel'] != 1) {
+            if ($_SESSION['idlevel'] != 2) {
                 $conn->query("INSERT INTO tb_data_error (email,waktu,url,ip_address) VALUES ('$_SESSION[id_user]',NOW(),'$absolute_url','$ip') ");
                 $conn->close();
                 ?>
@@ -41,12 +41,11 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                             <table id="table-<?=$module?>" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
-                                        <th>Nama Owner</th>
+                                        <th>Nama Pegawai</th>
                                         <th>Email</th>
-                                        <th>Password</th>
-                                        <th>Phone</th>
-                                        <th>Nama Business</th>
-                                        <th>Status</th>
+                                        <th>No HP</th>
+                                        <th>Roles</th>
+                                        <th>Cabang</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
