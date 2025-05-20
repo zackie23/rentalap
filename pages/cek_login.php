@@ -173,6 +173,14 @@ if(isset($_SESSION['csrf_token']) && $_POST['csrf_token'] == $_SESSION['csrf_tok
                     throw new Exception("Gagal menyimpan data owner: " . $conn->error);
                 }
 
+                //simpan owner 
+                $query_roles = "INSERT INTO tb_user_roles(user_id,role_id,created_by) 
+                                VALUES ('$new_user_id', 2, '$username')";
+
+                if(!$conn->query($query_roles)){
+                    throw new Exception("Gagal menyimpan data roles ". $conn->error );
+                }
+
                 // Commit transaksi
                 $conn->commit();
                 $success = "Loading..";

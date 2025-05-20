@@ -178,7 +178,6 @@ if($module == "pengguna"){
             // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
             $row[]	= $hasil1['name'];
             $row[]	= $hasil1['email'];
-            $row[]	= $hasil1['password'];
             $row[]	= $hasil1['phone'];
             $row[]	= $hasil1['business_name'];
             $row[]	= $hasil1['status'];
@@ -205,11 +204,12 @@ if($module == "pengguna"){
 
     $order1 = " order by t2.business_name ";
 
-    $query1 = "     select t1.id, t2.business_name, t3.name , t3.duration_days, t1.end_date, t1.is_active,
+    $query1 = "     select t1.id, t2.business_name, t3.name , t4.name owner, t3.duration_days, t1.end_date, t1.is_active,
                     ROW_NUMBER() OVER (".$order1.") AS no_urut
 				    from tb_subscriptions t1 
                     left join tb_owners t2 on t1.id_owner = t2.id
                     left join tb_packages t3 on t1.id_package = t3.id
+                    left join tb_users t4 on t2.user_id = t4.id 
 				";
 
     $query  =   "select * from (".$query1." ".$filter." )xxx";
@@ -233,10 +233,11 @@ if($module == "pengguna"){
             $row 	= array();
             // $row[]	= '<img src="'.$lambang.'" style="width:100%">';
             $row[]	= $hasil1['business_name'];
+            $row[]	= $hasil1['owner'];
             $row[]	= $hasil1['name'];
             $row[]	= $hasil1['duration_days'];
             $row[]	= $hasil1['end_date'];
-            $row[]	= $hasil1['is_active'];
+            $row[]	= ($hasil1['is_active'] == 1) ? "Aktif" : "Tidak Aktif";
 
             $row[]	= '<div class="btn-group btn-group-sm">
             <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>
@@ -398,7 +399,7 @@ if($module == "pengguna"){
 	}
 }elseif($module=="lapangan"){
     if($search!=""){
-		$filter	=	"	WHERE name like '%$search%'
+		$filter	=	"	WHERE t2.name like '%$search%'
 						";
 	}
 
@@ -429,11 +430,11 @@ if($module == "pengguna"){
             $id = base64_encrypt($hasil1['id'],$key);
             $row 	= array();
             $row[]  = $rownumawal+$a;
+            $row[]	= '<img  src="../'.$hasil1['image_url'].'" style="width:100px"/>';
             $row[]	= $hasil1['nama_cabang'];
             $row[]	= $hasil1['name'];
             $row[]	= $hasil1['sport_type'];
             $row[]	= $hasil1['hourly_price'];
-            $row[]	= $hasil1['image_url'];
             $row[]	= $hasil1['active'];
             $row[]	= '<div class="btn-group btn-group-sm">
             <a href="'.$module.'?act=edit&id='.$id.'" class="btn btn-warning"><i class="fas fa-edit"></i></a>

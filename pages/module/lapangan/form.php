@@ -26,6 +26,32 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
         $created_by = $_SESSION['id_user'];
         $updated_by = $_SESSION['id_user'];
 
+          // === UPLOAD IMAGE ===
+        $uploadDir   = '../uploads/';  
+            if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+            }
+
+            if (!empty($_FILES['image_url']['name']) && $_FILES['image_url']['error'] === UPLOAD_ERR_OK) {
+                $tmpName   = $_FILES['image_url']['tmp_name'];
+                $origName  = basename($_FILES['image_url']['name']);
+                $ext       = pathinfo($origName, PATHINFO_EXTENSION);
+                // Buat nama unik
+                $newName   = time() . '_' . bin2hex(random_bytes(5)) . '.' . $ext; 
+                $destPath  = $uploadDir . $newName;
+        
+                if (move_uploaded_file($tmpName, $destPath)) {
+                    // Simpan hanya relative path ke database, misal "uploads/12345_abcdef.jpg"
+                    $image_url = 'uploads/' . $newName;
+                } else {
+                    save_alert_swall('error', 'Gagal memindahkan file gambar.');
+                    // fallback, bisa set $image_url = NULL atau biarkan $image_url lama
+                }
+            }
+
+
+        
+
         if (isset($_POST['Simpan'])) {
             $query = "INSERT INTO tb_fields (name, sport_type, hourly_price, image_url, active, branch_id)
                     VALUES ('$name','$sport_type','$hourly_price','$image_url','$active','$branch_id')";
@@ -72,7 +98,7 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
             $hourly_price = $data['hourly_price'];
             $active= $data['active'];
             $branch_id= $data['branch_id'];
-            $image_url = $data['image_url'];
+            $image_url = '../'.$data['image_url'];
             $created_by = $data['created_by'];
         } else {
             $idb = "";
@@ -95,11 +121,15 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                         <div class="form-group">
                             <label>Cabang</label>
                             <select name="branch_id" class="form-control" <?= $readonly ?>>
-                                <?php
+                            <?php
                                     $query = "SELECT * from tb_branches";
                                     $exec = $conn->query($query);
                                     while($row = $exec->fetch_assoc()){
+                                        if($branch_id == $row['id']){
+                                            echo '<option value="'.$row['id'].'" selected>'.$row['name'].'</option>';
+                                        }else{
                                         echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                                        }
                                     }
                                 ?>
                             </select>
@@ -117,12 +147,15 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                             <input type="text" name="hourly_price" class="form-control" value="<?= $hourly_price ?>" required <?= $readonly ?>>
                         </div>
                         <div class="form-group">
-                            <label>image ulr </label>
-                            <input type="text" name="image_url" class="form-control" value="<?= $image_url ?>" required <?= $readonly ?>>
+                            <label>upload gambar </label>
+                            <input type="file" name="image_url" class="form-control" value="<?= $image_url ?>" required <?= $readonly ?>>
                         </div>
                         <div class="form-group">
                             <label>active </label>
-                            <input type="text" name="active" class="form-control" value="<?= $active ?>" required <?= $readonly ?>>
+                            <select name="active" class="form-control" value="<?= $active?>" <?= $readonly ?>>
+                                    <option value="Active" <?= $active == 'Active' ? "selected" : "" ?>>Active</option>
+                                    <option value="Tidak Active" <?= $active == 'Tidak Active' ? "selected" : "" ?>>Tidak Active</option>
+                            </select>
                         </div>
                     </div>
                     <div class="card-footer">
@@ -132,6 +165,11 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                 </div>
             </form>
         </div>
+        <div class="col-md-6">
+        <?php if (!empty($image_url) && file_exists($image_url)): ?>
+            <img src="<?= $image_url ?>" alt="Preview Gambar" style="width:100%;">
+        <?php endif; ?>
+        </div>    
     </div>
 <?php
     }

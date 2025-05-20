@@ -43,7 +43,6 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                                     <tr>
                                         <th>Nama Owner</th>
                                         <th>Email</th>
-                                        <th>Password</th>
                                         <th>Phone</th>
                                         <th>Nama Business</th>
                                         <th>Status</th>
