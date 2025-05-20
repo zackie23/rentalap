@@ -128,13 +128,13 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                             <label>Nama Business</label>
                             <select name="id_owner" class="form-control"  <?= $readonly ?>>
                                 <?php
-                                    $query = "SELECT * from tb_owners";
+                                    $query = "SELECT business_name, t1.id, t2.name from tb_owners t1 left join tb_users t2 on t1.user_id = t2.id ";
                                     $exec = $conn->query($query);
                                     while($row = $exec->fetch_assoc()){
                                         if($id_owner == $row['id']){
-                                            echo '<option value="'.$row['id'].'" selected>'.$row['business_name'].'</option>';
+                                            echo '<option value="'.$row['id'].'" selected>'.$row['business_name'].' | '.$row['name'].'</option>';
                                         }else{
-                                        echo '<option value="'.$row['id'].'">'.$row['business_name'].'</option>';
+                                            echo '<option value="'.$row['id'].'">'.$row['business_name'].' | '.$row['name'].'</option>';
                                         }
                                     }
                                 ?>

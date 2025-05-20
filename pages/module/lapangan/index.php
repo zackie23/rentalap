@@ -42,11 +42,11 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                                 <thead>
                                     <tr>
                                         <th>No</th>
+                                        <th>image url</th>
                                         <th>cabang</th>
                                         <th>Nama</th>
                                         <th>Sport type</th>
                                         <th>Hourly price</th>
-                                        <th>image url</th>
                                         <th>active</th>
                                         <th>Aksi</th>
                                     </tr>

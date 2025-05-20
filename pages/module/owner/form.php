@@ -22,8 +22,6 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
         $phone = $_POST['phone'];
         $business_name = $_POST['business_name'];
         $status = $_POST['status'];
-
-        $is_active = filter($_POST['is_active']);
         $created_by = $_SESSION['id_user'];
         $updated_by = $_SESSION['id_user'];
 
@@ -78,21 +76,22 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
 
             try {
                 $q_password = ($_POST['password'] != "") ? ", password='$password'" : "";
-                $q_avatar   = !empty($avatar_url) ? ", avatar_url='$avatar_url'" : "";
 
                 // Update tb_users
                 $query = "UPDATE tb_users 
                         SET name='$name', email='$email', phone='$phone', updated_by='$updated_by'
-                        $q_password $q_avatar 
+                        $q_password
                         WHERE id='$idb'";
                 
                 if (!$conn->query($query)) {
                     throw new Exception("Gagal update user: " . $conn->error);
                 }
-                
+                if($status == "Active"){
+                    $activated = "verified_at = NOW(),";
+                }
                 // Update tb_users
                 $query = "UPDATE tb_owners
-                        SET business_name='$business_name', status='$status', updated_by='$updated_by'
+                        SET business_name='$business_name', status='$status', $activated updated_by='$updated_by'
                         WHERE user_id='$idb'";
                 
                 if (!$conn->query($query)) {
@@ -115,6 +114,8 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
         $delete = $conn->query("DELETE FROM tb_users WHERE id='$id'");
 
         if ($delete) {
+            $conn->query("DELETE FROM tb_owners where user_id='$id'");
+            $conn->query("DELETE FROM tb_user_roles where user_id='$id'");
             save_alert_swall('save', 'Data berhasil dihapus');
         } else {
             save_alert_swall('error', 'Data gagal dihapus');
@@ -132,15 +133,13 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
             $phone = $data['phone'];
             $business_name = $data['business_name'];
             $status = $data['status'];
-            $avatar_url = $data['avatar_url'];
         } else {
             $idb = "";
             $name = "";
             $email = "";
             $phone = "";
-            $google_id = "";
-            $is_active = 1;
-            $avatar_url = "";
+            $business_name = "";
+            $status = "Pending";
         }
 ?>
     <div class="row">
@@ -161,7 +160,7 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                         </div>
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" name="password" class="form-control" required <?= $readonly ?>>
+                            <input type="password" name="password" class="form-control" <?= $readonly ?>>
                         </div>
                         <div class="form-group">
                             <label>Phone</label>
@@ -173,10 +172,10 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                         </div>
                         <div class="form-group">
                             <label>Status</label>
-                            <select name="is_active" class="form-control" <?= $readonly ?>>
-                                <option value="Active" <?= $is_active == 'Active' ? "selected" : "" ?>>Active</option>
-                                <option value="Pending" <?= $is_active == 'Pending' ? "selected" : "" ?>>Pending</option>
-                                <option value="Suspend" <?= $is_active == 'Suspend' ? "selected" : "" ?>>Suspend</option>
+                            <select name="status" class="form-control" value="<?= $status ?>" <?= $readonly ?>>
+                                <option value="Active" <?= $status == 'Active' ? "selected" : "" ?>>Active</option>
+                                <option value="Pending" <?= $status == 'Pending' ? "selected" : "" ?>>Pending</option>
+                                <option value="Suspend" <?= $status == 'Suspend' ? "selected" : "" ?>>Suspend</option>
                             </select>
                         </div>
                     </div>
@@ -186,14 +185,6 @@ if (empty($_SESSION['id_user']) && empty($_SESSION['passuser'])) {
                     </div>
                 </div>
             </form>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-header"><h5 class="text-muted">Foto Profil</h5><hr></div>
-                <div class="card-body text-center">
-                    <img src="<?= $avatar_url ?: 'https://via.placeholder.com/150' ?>" class="img-thumbnail" width="100%">
-                </div>
-            </div>
         </div>
     </div>
 <?php

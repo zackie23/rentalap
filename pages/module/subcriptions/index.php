@@ -42,6 +42,7 @@ if (empty($_SESSION['id_user']) AND empty($_SESSION['passuser'])) {
                                 <thead>
                                     <tr>
                                         <th>Nama Business</th>
+                                        <th>Owner</th>
                                         <th>Nama Package</th>
                                         <th>Durasi</th>
                                         <th>Expired at</th>
